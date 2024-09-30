@@ -14,6 +14,17 @@ import pyromod
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
+async def web_server():
+    app = web.Application()
+
+    # Define routes or other web server functionality
+    async def handle(request):
+        return web.Response(text="Hello from the bot!")
+
+    app.router.add_get("/", handle)
+    
+    return app
+
 class Bot(Client):
     def __init__(self):
         super().__init__(
