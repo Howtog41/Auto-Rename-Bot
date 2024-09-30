@@ -44,7 +44,7 @@ class Bot(Client):
         self.username = me.username
         app_runner = web.AppRunner(await web_server())
         await app_runner.setup()
-        bind_address = "0.0.0.0"
+        bind_address = "0.0.0.1"
         await web.TCPSite(app_runner, bind_address, Config.PORT).start()
         logging.info(f"{me.first_name} ✅✅ BOT started successfully ✅✅")
 
