@@ -2,19 +2,17 @@ import logging
 import logging.config
 import warnings
 from pyrogram import Client, idle
-from pyrogram import Client, __version__
+from pyrogram import __version__
 from pyrogram.raw.all import layer
 from config import Config
 from aiohttp import web
 from pytz import timezone
 from datetime import datetime
 import asyncio
-
 import pyromod
 
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
-
 
 class Bot(Client):
     def __init__(self):
@@ -33,19 +31,19 @@ class Bot(Client):
         me = await self.get_me()
         self.mention = me.mention
         self.username = me.username
-        app = web.AppRunner(await web_server())
-        await app.setup()
+        app_runner = web.AppRunner(await web_server())
+        await app_runner.setup()
         bind_address = "0.0.0.0"
-        await web.TCPSite(app, bind_address, Config.PORT).start()
+        await web.TCPSite(app_runner, bind_address, Config.PORT).start()
         logging.info(f"{me.first_name} ✅✅ BOT started successfully ✅✅")
 
-        for id in Config.ADMIN:
+        for admin_id in Config.ADMIN:
             try:
                 await self.send_message(
-                    id, f"**__{me.first_name}  Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️__**"
+                    admin_id, f"**__{me.first_name} Iꜱ Sᴛᴀʀᴛᴇᴅ.....✨️__**"
                 )
-            except:
-                pass
+            except Exception as e:
+                logging.error(f"Failed to send message to admin: {e}")
 
         if Config.LOG_CHANNEL:
             try:
@@ -54,10 +52,10 @@ class Bot(Client):
                 time = curr.strftime("%I:%M:%S %p")
                 await self.send_message(
                     Config.LOG_CHANNEL,
-                    f"**__{me.mention} Iꜱ Rᴇsᴛᴀʀᴛᴇᴅ !!**\n\n📅 Dᴀᴛᴇ : `{date}`\n⏰ Tɪᴍᴇ : `{time}`\n🌐 Tɪᴍᴇᴢᴏɴᴇ : `Asia/Kolkata`\n\🤖 Vᴇʀsɪᴏɴ : `v{__version__} (Layer {layer})`</b>",
+                    f"**__{me.mention} Iꜱ Rᴇsᴛᴀʀᴛᴇᴅ !!**\n\n📅 Dᴀᴛᴇ : `{date}`\n⏰ Tɪᴍᴇ : `{time}`\n🌐 Tɪᴍᴇᴢᴏɴᴇ : `Asia/Kolkata`\n🤖 Vᴇʀsɪᴏɴ : `v{__version__} (Layer {layer})`",
                 )
-            except:
-                print("Pʟᴇᴀꜱᴇ Mᴀᴋᴇ Tʜɪꜱ Iꜱ Aᴅᴍɪɴ Iɴ Yᴏᴜʀ Lᴏɢ Cʜᴀɴɴᴇʟ")
+            except Exception as e:
+                logging.error(f"Failed to send message to log channel: {e}")
 
     async def stop(self, *args):
         await super().stop()
@@ -66,21 +64,12 @@ class Bot(Client):
 
 bot_instance = Bot()
 
+async def start_services():
+    await bot_instance.start()
+    await idle()  # Keep the bot running
 
 def main():
-    async def start_services():
-        if Config.STRING_SESSION:
-            await asyncio.gather(
-                app.start(),  # Start the Pyrogram Client
-                bot_instance.start(),  # Start the bot instance
-            )
-        else:
-            await asyncio.gather(bot_instance.start())
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_services())
-    loop.run_forever()
-
+    asyncio.run(start_services())  # Use asyncio.run to start the bot properly
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore", message="There is no current event loop")
