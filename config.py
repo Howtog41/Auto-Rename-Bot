@@ -2,6 +2,8 @@ import re, os, time
 id_pattern = re.compile(r'^.\d+$') 
 
 class Config(object):
+    STRING_SESSION = "your_generated_session_string"
+
     # pyro client config
     API_ID    = os.environ.get("API_ID", "")
     API_HASH  = os.environ.get("API_HASH", "")
