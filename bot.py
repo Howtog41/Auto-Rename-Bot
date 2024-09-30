@@ -19,6 +19,7 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 
 class Bot(Client):
     def __init__(self):
+        app = Client
         super().__init__(
             name="AshutoshGoswami24",
             api_id=Config.API_ID,
